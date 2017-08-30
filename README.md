@@ -1,6 +1,6 @@
 # White Rabbit
 
-Neopixel based XY Matrix running via Raspberry Pi to display time, weather, and news.
+[Neopixel](https://www.adafruit.com/category/168) based XY Matrix running via Raspberry Pi to display time, weather, and news.
 
 ![White Rabbit](https://github.com/jwalanta/whiterabbit/raw/master/whiterabbit.jpg)
 
@@ -14,6 +14,14 @@ Neopixel based XY Matrix running via Raspberry Pi to display time, weather, and 
 - Any Linux based OS running on Raspberry Pi
 - Python
 - [rpi_ws281x library](https://github.com/jgarff/rpi_ws281x). Tutorial on using: https://learn.adafruit.com/neopixels-on-raspberry-pi/overview
+
+## Running
+
+```
+./run.sh
+``` 
+
+However, before doing that read how to build the matrix, connect it to Raspberry Pi, and adjust the settings below.
 
 ## Building the display matrix
 
@@ -58,17 +66,29 @@ If five strips of neopixels with 144 pixels/m are arranged in this way, the pixe
 
 ### Connecting to Raspberry Pi
 
-### Displaying 
+The 5V and GND pins from the strip can be connected to any 5V and GND pin of Raspberry Pi. If there are lots of pixels and you are planning to use the full brightness, you need to connect it to external power source with higher amp.
+
+The data pin is connected to any GPIO pin with PWM (18 by default).
+
+See https://learn.adafruit.com/adafruit-neopixel-uberguide for more details about connection and best practices.
+
+### Displaying text
+
+[BDF font](https://en.wikipedia.org/wiki/Glyph_Bitmap_Distribution_Format) files are used to read data for each character. Modify the values in `whiterabbit.py` to specify the font file. The `MatrixBuffer` class is used to construct the buffer before sending the data to the neopixel strip. The `NeopixelWrapper::matrix_to_array()` converts the matrix to serial data. If the strips are arranged in a different way than described above, this function has to be adjusted to change the mapping.
+
+`MatrixBuffer` has helper functions to display character text or character.
+
+By default, the current time and weather condition is displayed.
+
+### Scrolling text
+
+The program also reads fifo file at `/tmp/matrix.fifo`. If any line of text is written to it, e.g., `echo 'Hello, World! This is a scrolling test' > /tmp/matrix.fifo`, the text is scrolled on the display. Once the scroll is done, it goes back to displaying time and weather.
 
 ## Weather data
 
 Weather data is from [Wunderground](https://www.wunderground.com/weather/api/d/docs). They have a pretty nice api for current weather conditions and daily forecast. The free plan is good for 500 calls per day and 10 calls per minute. To make a call every 15 minutes, it's sufficient.
 
-The data is retrieved and stored to a file on disk via cron job.
-
-## Cron jobs
-
-Cron jobs look something like this (replace <key> with api key, state and city appropriately)
+The data is retrieved and stored to a file on disk via cron job. Cron jobs look something like this (replace <key> with api key, state and city appropriately)
 ```
 # weather data, every 15 minutes
 */15 * * * * curl 'http://api.wunderground.com/api/<key>/conditions/q/CA/San_Francisco.json' > /var/cache/conditions.json
