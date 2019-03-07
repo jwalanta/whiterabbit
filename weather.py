@@ -8,31 +8,12 @@ import time
 class Weather:
 
 	def __init__(self):
-		self.conditions_file = "/var/cache/conditions.json"
-		self.conditions_mtime = 0
-		self.conditions = {}
-
 		self.forecast_file = "/var/cache/forecast.json"
 		self.forecast_mtime = 0
 		self.forecast = {}
 
 	def update(self):
 		current_time = time.time()
-
-		# update conditions
-		if os.path.isfile(self.conditions_file):
-			# check if file has been modified
-			if os.path.getmtime(self.conditions_file) != self.conditions_mtime:
-				self.conditions_mtime = os.path.getmtime(self.conditions_file)
-				f = open(self.conditions_file, "r")
-				self.conditions = json.load(f)
-				f.close()
-		else:
-			# file can be unavailable if the cron is writing on it
-			# reset only if it's older than an hour
-			if current_time - self.conditions_mtime > 3600:
-				self.conditions_mtime = 0
-				self.conditions = {}
 
 		# update forecast
 		if os.path.isfile(self.forecast_file):
@@ -52,14 +33,14 @@ class Weather:
 	def get_current_temperature(self):
 		try:
 			self.update()
-			return str(self.conditions['current_observation']['temp_f']) + "F"
+			return str(self.forecast['currentobservation']['Temp']) + "F"
 		except:
 			return ""
 
 	def get_today_forecast(self):
 		try:
 			self.update()
-			today = self.forecast['forecast']['simpleforecast']['forecastday'][0]
-			return (str(today['high']['fahrenheit']), str(today['low']['fahrenheit']))
+			t = self.forecast["data"]["temperature"]
+			return (max(t[0],t[1]), min(t[0],t[1]))
 		except:
 			return ("","")

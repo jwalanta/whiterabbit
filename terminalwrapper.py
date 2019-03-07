@@ -14,14 +14,14 @@ class TerminalWrapper:
 		sys.stderr.write("\x1b[2J\x1b[H")
 
 		sys.stdout.write(" ")
-		for c in xrange(cols):
+		for c in range(cols):
 			sys.stdout.write(str(c%10))
 		print
 
 		count = 0
-		for r in xrange(rows):
+		for r in range(rows):
 			sys.stdout.write(str(r))
-			for c in xrange(cols):
+			for c in range(cols):
 				if matrix[r][c] > 0:
 					sys.stdout.write("█")
 					count = count + 1

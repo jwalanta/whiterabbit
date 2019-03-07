@@ -7,14 +7,6 @@ Matrix Buffer to compute output
 
 import time
 
-
-def Color(red, green, blue, white = 0):
-	"""Convert the provided red, green, blue color to a 24-bit color value.
-	Each color component should be a value 0-255 where 0 is the lowest intensity
-	and 255 is the highest intensity.
-	"""
-	return (white << 24) | (red << 16)| (green << 8) | blue	
-
 class MatrixBuffer:
 
 	ALIGN_LEFT   = -1
@@ -27,7 +19,7 @@ class MatrixBuffer:
 		self.cols = cols
 		self.font = font
 		self.display_wrapper = display_wrapper
-		self.matrix = [[0 for c in xrange(cols)] for r in xrange(rows)]
+		self.matrix = [[0 for c in range(cols)] for r in range(rows)]
 
 	def get_rows(self):
 		return self.rows
@@ -48,7 +40,11 @@ class MatrixBuffer:
 		for n in char_data:
 			col = c
 			for p in list(bin(n)[2:].zfill(8)):
-				self.write_pixel(row, col, (ord(p) - 48) * color)
+				if p == '0':
+					self.write_pixel(row, col, (0,0,0))
+				else:
+					self.write_pixel(row, col, color)
+					
 				col = col + 1
 			row = row + 1
 
@@ -77,8 +73,8 @@ class MatrixBuffer:
 		time.sleep(3)
 
 		# start scrolling
-		for st in xrange(len(str)):
-			for offset in xrange(self.font.get_width() + self.CHAR_SPACING):
+		for st in range(len(str)):
+			for offset in range(self.font.get_width() + self.CHAR_SPACING):
 				self.clear()
 				self.write_string_at(0, -offset, str[st:], color)
 				self.show()
@@ -88,8 +84,8 @@ class MatrixBuffer:
 		self.show()
 
 	def clear(self):
-		for r in xrange(self.rows):
-			for c in xrange(self.cols):
+		for r in range(self.rows):
+			for c in range(self.cols):
 				self.matrix[r][c] = 0
 
 	def show(self):

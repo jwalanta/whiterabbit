@@ -4,6 +4,8 @@
 import time
 import socket
 import os
+import signal
+import sys
 
 from bdffont import *
 from matrixbuffer import *
@@ -12,23 +14,23 @@ from weather import *
 # matrix rows and cols in pixels
 MATRIX_ROWS = 5
 MATRIX_COLS = 144
-RPI_HOSTNAME = "osmc"
+RPI_HOSTNAME = "jdpi"
 FIFO_PATH = "/tmp/matrix.fifo"
 
 # define colors
-COLOR_BLACK = Color(0,0,0)
-COLOR_BLUE = Color(0,0,1)
-COLOR_GREEN = Color(0,1,0)
-COLOR_AQUA = Color(0,1,1)
-COLOR_RED = Color(1,0,0)
-COLOR_PURPLE = Color(1,0,1)
-COLOR_YELLOW = Color(1,1,0)
-COLOR_WHITE = Color(1,1,1)
+COLOR_BLACK = (0,0,0)
+COLOR_BLUE = (0,0,1)
+COLOR_GREEN = (0,1,0)
+COLOR_AQUA = (0,1,1)
+COLOR_RED = (1,0,0)
+COLOR_PURPLE = (1,0,1)
+COLOR_YELLOW = (1,1,0)
+COLOR_WHITE = (1,1,1)
 
 # set display wrapper to either terminal or neopixel based on hostname
 if socket.gethostname() == RPI_HOSTNAME:
 	from neopixelwrapper import *
-	display_wrapper = NeopixelWrapper()	
+	display_wrapper = NeopixelWrapper()
 else:
 	from terminalwrapper import *
 	display_wrapper = TerminalWrapper()
@@ -39,11 +41,20 @@ weather = Weather()
 
 # create fifo pipe
 try:
-	os.mkfifo(FIFO_PATH, 0666)
+	os.mkfifo(FIFO_PATH, 0o666)
 except OSError:
 	pass
 
 fifo=open(FIFO_PATH, "r")
+
+# capture kill signal
+def signal_term_handler(signal, frame):
+	mb.clear()
+	mb.show()
+	fifo.close()
+	sys.exit(0)
+ 
+signal.signal(signal.SIGTERM, signal_term_handler)
 
 while True:
 
@@ -72,9 +83,12 @@ while True:
 			mb.scroll_string(line[:256], COLOR_GREEN)
 			time.sleep(1)
 
-	except:
+	except KeyboardInterrupt:
 		mb.clear()
 		mb.show()
 		fifo.close()
 		break
+	
+	except:
+		pass
 

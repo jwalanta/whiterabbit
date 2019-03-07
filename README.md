@@ -15,6 +15,16 @@
 - Python
 - [rpi_ws281x library](https://github.com/jgarff/rpi_ws281x). Tutorial on using: https://learn.adafruit.com/neopixels-on-raspberry-pi/overview
 
+```
+# TL;DR for installing rpi_ws281x library
+
+# install pip if not installed
+$ sudo apt install python3-pip
+
+# install libraries
+$ sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
+```
+
 ## Running
 
 ```
@@ -86,13 +96,12 @@ The program also reads fifo file at `/tmp/matrix.fifo`. If any line of text is w
 
 ## Weather data
 
-Weather data is from [Wunderground](https://www.wunderground.com/weather/api/d/docs). They have a pretty nice api for current weather conditions and daily forecast. The free plan is good for 500 calls per day and 10 calls per minute. To make a call every 15 minutes, it's sufficient.
+Weather data is from [National Weather Service](https://www.weather.gov/). The forecast and current conditions data for a given lat/lon location can be retrieved in json format (among several others).
 
-The data is retrieved and stored to a file on disk via cron job. Cron jobs look something like this (replace <key> with api key, state and city appropriately)
+The data is retrieved and stored to a file on disk via cron job. Cron jobs look something like this (replace lat and lon data appropriately)
 ```
-# weather data, every 15 minutes
-*/15 * * * * curl 'http://api.wunderground.com/api/<key>/conditions/q/CA/San_Francisco.json' > /var/cache/conditions.json
-*/15 * * * * curl 'http://api.wunderground.com/api/<key>/forecast/q/CA/San_Francisco.json' > /var/cache/forecast.json
+# weather data, every hour
+0 * * * * curl 'https://forecast.weather.gov/MapClick.php?lat=37.7771&lon=-122.4196&unit=0&lg=english&FcstType=json' > /var/cache/forecast.json
 ```
 
 ## What's in the name?
