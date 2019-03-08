@@ -27,11 +27,22 @@ $ sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 
 ## Running
 
+Before running, there are few modifications to the code you might have to do:
+
+- in `neopixelwrapper.py`:
+  - modify the `LED_COUNT`, `LED_PIN`, and `LED_ORDER` variables
+  - modify `matrix_to_array` function to match the layout of the neopixel matrix
+- in `whiterabbit.py`:
+  - modify `MATRIX_ROWS`, `MATRIX_COLS` to match rows and columns of pixel in the matrix
+  - modify `RPI_HOSTNAME` to match the hostname the code is running on. otherwise it'll emulate the matrix on terminal
+
+Once everything is set, as root run:
+
 ```
 ./run.sh
 ``` 
 
-However, before doing that read how to build the matrix, connect it to Raspberry Pi, and adjust the settings below.
+However, before doing that, read how to build the matrix, connect it to Raspberry Pi, and adjust the settings below.
 
 ## Building the display matrix
 
