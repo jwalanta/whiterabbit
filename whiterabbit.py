@@ -45,18 +45,18 @@ try:
 except OSError:
 	pass
 
+loop = True
+
 fifo=open(FIFO_PATH, "r")
 
 # capture kill signal
 def signal_term_handler(signal, frame):
-	mb.clear()
-	mb.show()
-	fifo.close()
-	sys.exit(0)
+	global loop
+	loop = False
  
 signal.signal(signal.SIGTERM, signal_term_handler)
 
-while True:
+while loop:
 
 	try:
 
@@ -84,11 +84,12 @@ while True:
 			time.sleep(1)
 
 	except KeyboardInterrupt:
-		mb.clear()
-		mb.show()
-		fifo.close()
 		break
 	
 	except:
 		pass
 
+# cleanup
+mb.clear()
+mb.show()
+fifo.close()
