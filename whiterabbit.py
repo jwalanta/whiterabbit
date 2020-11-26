@@ -63,7 +63,7 @@ while loop:
 		mb.clear()
 		
 		# current temperature
-		mb.write_string(weather.get_current_temperature(), COLOR_YELLOW, mb.ALIGN_RIGHT)
+		mb.write_string(weather.get_current_temperature(), weather.get_current_aqi_color(), mb.ALIGN_RIGHT)
 
 		# today high and low
 		high, low = weather.get_today_forecast()

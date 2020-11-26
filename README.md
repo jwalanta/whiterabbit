@@ -105,14 +105,19 @@ By default, the current time and weather condition is displayed.
 
 The program also reads fifo file at `/tmp/matrix.fifo`. If any line of text is written to it, e.g., `echo 'Hello, World! This is a scrolling test' > /tmp/matrix.fifo`, the text is scrolled on the display. Once the scroll is done, it goes back to displaying time and weather.
 
-## Weather data
+## Weather and air quality data
 
 Weather data is from [National Weather Service](https://www.weather.gov/). The forecast and current conditions data for a given lat/lon location can be retrieved in json format (among several others).
+
+Air quality data is from [Airnow.gov](https://www.airnow.gov).
 
 The data is retrieved and stored to a file on disk via cron job. Cron jobs look something like this (replace lat and lon data appropriately)
 ```
 # weather data, every hour
 0 * * * * curl 'https://forecast.weather.gov/MapClick.php?lat=37.7771&lon=-122.4196&unit=0&lg=english&FcstType=json' > /var/cache/forecast.json
+
+# airnow data, every hour
+0 * * * * curl --data 'latitude=37.7771&longitude=-122.4196&stateCode=CA&maxDistance=50' https://airnowgovapi.com/reportingarea/get > /var/cache/airnow.json
 ```
 
 ## What's in the name?
